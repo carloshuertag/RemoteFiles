@@ -2,37 +2,33 @@ package com.chuertag.practica1.client.gui;
 
 import com.chuertag.practica1.RemoteFilesProperties;
 import java.awt.BorderLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.io.File;
 import javax.swing.JButton;
+import javax.swing.JFileChooser;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreePath;
+import javax.swing.UIManager;
 
 /**
  *
  * @author root
  */
-public class ClientFilesPanel extends JPanel implements ActionListener{
+public class ClientFilesPanel extends JPanel implements ActionListener {
+
     JTextField jtf;
-    JTree tree;
-    JButton refresh, send;
+    File jfcroot;
+    JFileChooser jfc;
+    JButton refresh;
     JPanel navbar;
-    JScrollPane jsp;
     String currDirectory = null;
 
     public ClientFilesPanel() {
-        File temp = new File(RemoteFilesProperties.CURRENT_ABSOLUTE_PATH
+        UIManager.put("FileChooser.chooseButtonText", "Send file(s)");
+        UIManager.put("FileChooser.cancelButtonText", "Choose");
+        jfcroot = new File(RemoteFilesProperties.CURRENT_ABSOLUTE_PATH
                 + RemoteFilesProperties.CLIENT_DIRECTORY);
-        DefaultMutableTreeNode top = createTree(temp);
-
         navbar = new JPanel(new BorderLayout());
         jtf = new JTextField(RemoteFilesProperties.CURRENT_ABSOLUTE_PATH
                 + RemoteFilesProperties.CLIENT_DIRECTORY);
@@ -40,84 +36,36 @@ public class ClientFilesPanel extends JPanel implements ActionListener{
         refresh.addActionListener(this);
         navbar.add(jtf, BorderLayout.CENTER);
         navbar.add(refresh, BorderLayout.EAST);
-        tree = new JTree(top);
-        jsp = new JScrollPane(tree);
-        
+        setFileChooser();
         setLayout(new BorderLayout());
-        send = new JButton("Send file(s)");
         add(navbar, BorderLayout.NORTH);
-        add(jsp, BorderLayout.CENTER);
-        add(send, BorderLayout.SOUTH);
-        tree.addMouseListener(new MouseAdapter() {
-                public void mouseClicked(MouseEvent me) {
-                        doMouseClicked(me);
-                }
-        });
+        add(jfc, BorderLayout.CENTER);
         jtf.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        File temp = new File(jtf.getText());
-        DefaultMutableTreeNode newtop = createTree(temp);
-        if (newtop != null)
-            tree = new JTree(newtop);
-        remove(navbar);
-        remove(jsp);
-        remove(refresh);
-        jsp = new JScrollPane(tree);
-        setVisible(false);
-        add(navbar, BorderLayout.NORTH);
-        add(jsp, BorderLayout.CENTER);
-        add(send, BorderLayout.SOUTH);
-        tree.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent me) {
-                doMouseClicked(me);
-            }
-        });
-        setVisible(true);
+        jfcroot = new File(jtf.getText());
+        if (jfcroot != null && jfcroot.exists()) {
+            remove(navbar);
+            remove(jfc);
+            setVisible(false);
+            setFileChooser();
+            add(navbar, BorderLayout.NORTH);
+            add(jfc, BorderLayout.CENTER);
+            setVisible(true);
+        }
+        if (ev.getActionCommand().equals("CancelSelection")) {
+            System.out.printf("CancelSelection\n");
+        }
+        if (ev.getActionCommand().equals("ApproveSelection")) {
+            System.out.printf("ApproveSelection\n");
+        }
     }
 
-    DefaultMutableTreeNode createTree(File temp) {
-        DefaultMutableTreeNode top = new DefaultMutableTreeNode(temp.getPath());
-        fillTree(top, temp.getPath());
-
-        return top;
-    }
-
-    void fillTree(DefaultMutableTreeNode root, String filename) {
-            File temp = new File(filename);
-
-            if (!(temp.exists() && temp.isDirectory()))
-                return;
-            File[] filelist = temp.listFiles();
-            for (int i = 0; i < filelist.length; i++) {
-                final DefaultMutableTreeNode tempDmtn = new DefaultMutableTreeNode(
-                        filelist[i].getName());
-                root.add(tempDmtn);
-                final String newfilename = new String(filename +
-                        RemoteFilesProperties.SLASH + filelist[i].getName());
-                Thread t = new Thread() {
-                    public void run() {
-                        fillTree(tempDmtn, newfilename);
-                    }
-                };
-                if (t == null) {
-                    System.out.println("no more thread allowed " + newfilename);
-                    return;
-                }
-                t.start();
-            }
-    }
-
-    void doMouseClicked(MouseEvent me) {
-        TreePath tp = tree.getPathForLocation(me.getX(), me.getY());
-        if (tp == null)
-            return;
-        String s = tp.toString();
-        s = s.replace("[", "");
-        s = s.replace("]", "");
-        s = s.replace(", ", RemoteFilesProperties.SLASH);
-        jtf.setText(s);
+    public void setFileChooser() {
+        jfc = new JFileChooser(jfcroot);
+        jfc.setMultiSelectionEnabled(true);
+        jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     }
 }
