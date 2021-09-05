@@ -12,7 +12,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 public class RemoteFilesClient {
 
     public static void main(String[] args) {
-        if (((String) (System.getProperty("os.name"))).contains("Windows")) {
+        if ((System.getProperty("os.name")).contains("Windows")) {
             RemoteFilesProperties.windows();
         }
         JFrame jFrame = new JFrame("Remote Files");

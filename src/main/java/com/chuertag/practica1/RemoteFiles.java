@@ -15,6 +15,22 @@ import javax.swing.JProgressBar;
  * @author chuertag
  */
 public class RemoteFiles {
+    
+    /**
+     * @param ipAddress Server IP Addressss to receive files from.
+     * @param port Application port to receive the files from.
+     * @param flag Whether client is going to send or receive.
+     * @throws java.io.IOException If it cannot stablish connection using the given info.
+     */
+    public static void notifyServer(String ipAddress, int port, boolean flag)
+            throws IOException{
+        Socket client = new Socket(ipAddress, port + 1);
+        DataOutputStream dos = new DataOutputStream(client.getOutputStream());
+        dos.writeBoolean(flag);
+        dos.flush();
+        dos.close();
+        client.close();
+    }
 
     /**
      * @param filename Filename to be received from Server.
@@ -136,5 +152,13 @@ public class RemoteFiles {
                 dos.close();
             }
         }
+    }
+    
+    public static void setJProgressBar(JProgressBar jpb, String text){
+        jpb = new JProgressBar(JProgressBar.HORIZONTAL, 0, 100);
+        jpb.setValue(0);
+        jpb.setString(text);
+        jpb.setStringPainted(true);
+        jpb.setSize(100, 240);
     }
 }

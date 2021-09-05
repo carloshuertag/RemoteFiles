@@ -1,13 +1,17 @@
 package com.chuertag.practica1.client.gui;
 
+import com.chuertag.practica1.RemoteFiles;
 import com.chuertag.practica1.RemoteFilesProperties;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
 
@@ -17,16 +21,18 @@ import javax.swing.UIManager;
  */
 public class ClientFilesPanel extends JPanel implements ActionListener {
 
-    JTextField jtf;
-    File jfcroot;
-    JFileChooser jfc;
-    JButton refresh;
-    JPanel navbar;
-    String currDirectory = null;
+    private JTextField jtf;
+    private File jfcroot;
+    private JFileChooser jfc;
+    private JButton refresh;
+    private JPanel navbar;
+    private JProgressBar jpb;
+    private String serverIP;
+    private int port;
 
-    public ClientFilesPanel() {
-        UIManager.put("FileChooser.chooseButtonText", "Send file(s)");
-        UIManager.put("FileChooser.cancelButtonText", "Choose");
+    public ClientFilesPanel(String ipAddress, int port) {
+        serverIP = ipAddress;
+        this.port = port;
         jfcroot = new File(RemoteFilesProperties.CURRENT_ABSOLUTE_PATH
                 + RemoteFilesProperties.CLIENT_DIRECTORY);
         navbar = new JPanel(new BorderLayout());
@@ -41,31 +47,55 @@ public class ClientFilesPanel extends JPanel implements ActionListener {
         add(navbar, BorderLayout.NORTH);
         add(jfc, BorderLayout.CENTER);
         jtf.addActionListener(this);
+        jfc.addActionListener(this);
     }
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        jfcroot = new File(jtf.getText());
-        if (jfcroot != null && jfcroot.exists()) {
-            remove(navbar);
-            remove(jfc);
-            setVisible(false);
-            setFileChooser();
-            add(navbar, BorderLayout.NORTH);
-            add(jfc, BorderLayout.CENTER);
-            setVisible(true);
+        if (ev.getSource().equals(refresh)) {
+            jfcroot = new File(jtf.getText());
+            if (jfcroot != null && jfcroot.exists()) {
+                remove(navbar);
+                remove(jfc);
+                setVisible(false);
+                setFileChooser();
+                add(navbar, BorderLayout.NORTH);
+                add(jfc, BorderLayout.CENTER);
+                setVisible(true);
+            }
         }
         if (ev.getActionCommand().equals("CancelSelection")) {
-            System.out.printf("CancelSelection\n");
+            try {
+                jtf.setText(jfc.getSelectedFile().getCanonicalPath());
+                if (jfc.getSelectedFile().isDirectory()) {
+                    jfc.setCurrentDirectory(jfc.getSelectedFile());
+                } else {
+                    jfc.setCurrentDirectory(jfc.getSelectedFile().getParentFile());
+                }
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Invalid selection");
+            }
         }
         if (ev.getActionCommand().equals("ApproveSelection")) {
-            System.out.printf("ApproveSelection\n");
+            RemoteFiles.setJProgressBar(jpb, "Sending files");
+            JOptionPane.showMessageDialog(null, jpb);
+            try {
+                RemoteFiles.notifyServer(serverIP, port, true);
+                RemoteFiles.sendFiles(jfc.getSelectedFiles(), jpb, false, "",
+                        false, serverIP, port);
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null,
+                        "Oops! An error occured when sending file(s)");
+            }
         }
     }
 
-    public void setFileChooser() {
+    private void setFileChooser() {
         jfc = new JFileChooser(jfcroot);
+        UIManager.put("FileChooser.chooseButtonText", "Send file(s)");
+        UIManager.put("FileChooser.cancelButtonText", "Choose");
         jfc.setMultiSelectionEnabled(true);
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
     }
+    
 }

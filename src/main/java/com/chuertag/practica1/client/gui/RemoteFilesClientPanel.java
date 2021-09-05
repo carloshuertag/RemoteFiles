@@ -38,7 +38,6 @@ public class RemoteFilesClientPanel extends JPanel implements ActionListener{
     }
     
     public void initComponents() {
-        clientFiles = new ClientFilesPanel();
         inputs = new JPanel(new GridLayout(3, 2, 1, 1));
         addrLabel = new JLabel("Remote IP Address: ");
         addrTF = new JTextField(RemoteFilesProperties.SERVER_IPADDR);
@@ -46,6 +45,8 @@ public class RemoteFilesClientPanel extends JPanel implements ActionListener{
         portLabel = new JLabel("Server Port: ");
         portTF = new JTextField(String.valueOf(RemoteFilesProperties.PORT));
         portTF.addActionListener(this);
+        clientFiles = new ClientFilesPanel(addrTF.getText(),
+                Integer.parseInt(portTF.getText()));
         serverFiles = new ServerFilesPanel(addrTF.getText(),
                 Integer.parseInt(portTF.getText()));
         instruct = new JLabel(
@@ -74,6 +75,14 @@ public class RemoteFilesClientPanel extends JPanel implements ActionListener{
         }
         if(portTF.getText().equals("#####")){
             return;
+        }
+        if(e.getSource().equals(connectButton)){
+            setVisible(false);
+            remove(serverFiles);
+            serverFiles = new ServerFilesPanel(addrTF.getText(),
+                Integer.parseInt(portTF.getText()));
+            add(serverFiles, BorderLayout.CENTER);
+            setVisible(true);
         }
     }
     
