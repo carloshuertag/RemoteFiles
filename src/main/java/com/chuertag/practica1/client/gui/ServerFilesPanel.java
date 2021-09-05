@@ -10,8 +10,6 @@ import java.io.ObjectInputStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -55,6 +53,8 @@ public class ServerFilesPanel extends JPanel implements ActionListener {
             ObjectInputStream ois = new ObjectInputStream(
                     client.getInputStream());
             treeNode = (DefaultMutableTreeNode) ois.readObject();
+            ois.close();
+            client.close();
         } catch (ClassNotFoundException ex) {
             JOptionPane.showMessageDialog(null,
                     "Oops! On error occured when receiving server data, please try again");
@@ -68,8 +68,9 @@ public class ServerFilesPanel extends JPanel implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        List<String> temp = new ArrayList<String>();
-        DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode) serverFilesTree.getLastSelectedPathComponent();
+        List<String> temp = new ArrayList<>();
+        DefaultMutableTreeNode treeNode = (DefaultMutableTreeNode)
+                serverFilesTree.getLastSelectedPathComponent();
         int i;
         String filename = "";
         temp.add(treeNode.toString());
@@ -82,14 +83,15 @@ public class ServerFilesPanel extends JPanel implements ActionListener {
                 filename += RemoteFilesProperties.SLASH;
             }
         }
-        RemoteFiles.setJProgressBar(jpb, "Receiving files");
+        jpb = RemoteFiles.setJProgressBar("Receiving files");
         JOptionPane.showMessageDialog(null, jpb);
         try {
             RemoteFiles.notifyServer(serverIPAddr, port, false);
             RemoteFiles.receiveFiles(filename, System.getProperty("user.dir")
                     + RemoteFilesProperties.SLASH
                     + RemoteFilesProperties.CLIENT_DIRECTORY
-                    + RemoteFilesProperties.SLASH, false, jpb, serverIPAddr, port);
+                    + RemoteFilesProperties.SLASH, false, null, jpb,
+                    serverIPAddr, port);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null,
                     "Oops! An error occured when receiving file(s)");

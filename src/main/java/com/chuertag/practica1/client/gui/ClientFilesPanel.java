@@ -77,12 +77,12 @@ public class ClientFilesPanel extends JPanel implements ActionListener {
             }
         }
         if (ev.getActionCommand().equals("ApproveSelection")) {
-            RemoteFiles.setJProgressBar(jpb, "Sending files");
+            jpb = RemoteFiles.setJProgressBar("Sending files");
             JOptionPane.showMessageDialog(null, jpb);
             try {
                 RemoteFiles.notifyServer(serverIP, port, true);
                 RemoteFiles.sendFiles(jfc.getSelectedFiles(), jpb, false, "",
-                        false, serverIP, port);
+                        false, null, serverIP, port);
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null,
                         "Oops! An error occured when sending file(s)");
