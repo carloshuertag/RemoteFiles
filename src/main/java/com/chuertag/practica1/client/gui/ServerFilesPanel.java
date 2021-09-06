@@ -1,7 +1,7 @@
 package com.chuertag.practica1.client.gui;
 
-import com.chuertag.practica1.RemoteFiles;
 import com.chuertag.practica1.RemoteFilesProperties;
+import com.chuertag.practica1.client.RemoteFilesClient;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -83,15 +83,14 @@ public class ServerFilesPanel extends JPanel implements ActionListener {
                 filename += RemoteFilesProperties.SLASH;
             }
         }
-        jpb = RemoteFiles.setJProgressBar("Receiving files");
+        jpb = RemoteFilesClient.setJProgressBar("Receiving files");
         JOptionPane.showMessageDialog(null, jpb);
         try {
-            RemoteFiles.notifyServer(serverIPAddr, port, false);
-            RemoteFiles.receiveFiles(filename, System.getProperty("user.dir")
+            RemoteFilesClient.notifyServer(serverIPAddr, port, false);
+            RemoteFilesClient.receiveFiles(filename, System.getProperty("user.dir")
                     + RemoteFilesProperties.SLASH
                     + RemoteFilesProperties.CLIENT_DIRECTORY
-                    + RemoteFilesProperties.SLASH, false, null, jpb,
-                    serverIPAddr, port);
+                    + RemoteFilesProperties.SLASH, jpb, serverIPAddr, port);
         } catch (IOException ex) {
             JOptionPane.showMessageDialog(null,
                     "Oops! An error occured when receiving file(s)");

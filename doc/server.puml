@@ -1,0 +1,14 @@
+@startuml
+class com.chuertag.practica1.RemoteFilesProperties
+class com.chuertag.practica1.server.RemoteFilesServer
+class java.io.DataInputStream
+class java.io.DataOutputStream
+class java.io.File
+class java.io.FileInputStream
+class java.io.FileOutputStream
+class java.io.IOException
+class java.io.ObjectOutputStream
+class java.net.ServerSocket
+class java.net.Socket
+class javax.swing.tree.DefaultMutableTreeNode
+@enduml

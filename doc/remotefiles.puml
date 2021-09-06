@@ -1,0 +1,46 @@
+@startuml
+class com.chuertag.practica1.RemoteFilesProperties
+class com.chuertag.practica1.client.RemoteFilesClient
+class com.chuertag.practica1.client.gui.ClientFilesPanel
+class com.chuertag.practica1.client.gui.RemoteFilesClientPanel
+class com.chuertag.practica1.client.gui.ServerFilesPanel
+class com.chuertag.practica1.server.RemoteFilesServer
+class java.awt.BorderLayout
+class java.awt.GridLayout
+class java.awt.event.ActionEvent
+class java.io.DataInputStream
+class java.io.DataOutputStream
+class java.io.File
+class java.io.FileInputStream
+class java.io.FileOutputStream
+class java.io.IOException
+class java.io.ObjectInputStream
+class java.io.ObjectOutputStream
+class java.net.ServerSocket
+class java.net.Socket
+class java.util.ArrayList
+class java.util.List
+class javax.swing.JButton
+class javax.swing.JFileChooser
+class javax.swing.JFrame
+class javax.swing.JLabel
+class javax.swing.JOptionPane
+class javax.swing.JPanel
+class javax.swing.JProgressBar
+class javax.swing.JScrollPane
+class javax.swing.JTextField
+class javax.swing.JTree
+class javax.swing.SwingConstants
+class javax.swing.UIManager
+class javax.swing.WindowConstants
+class javax.swing.tree.DefaultMutableTreeNode
+class javax.swing.tree.TreeSelectionModel
+interface java.awt.event.ActionListener
+com.chuertag.practica1.client.RemoteFilesClient ..> javax.swing.WindowConstants
+com.chuertag.practica1.client.gui.ClientFilesPanel --|> javax.swing.JPanel
+com.chuertag.practica1.client.gui.ClientFilesPanel --|> java.awt.event.ActionListener
+com.chuertag.practica1.client.gui.RemoteFilesClientPanel --|> javax.swing.JPanel
+com.chuertag.practica1.client.gui.RemoteFilesClientPanel --|> java.awt.event.ActionListener
+com.chuertag.practica1.client.gui.ServerFilesPanel --|> javax.swing.JPanel
+com.chuertag.practica1.client.gui.ServerFilesPanel --|> java.awt.event.ActionListener
+@enduml

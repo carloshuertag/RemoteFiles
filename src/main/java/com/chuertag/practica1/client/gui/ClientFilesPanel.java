@@ -1,7 +1,7 @@
 package com.chuertag.practica1.client.gui;
 
-import com.chuertag.practica1.RemoteFiles;
 import com.chuertag.practica1.RemoteFilesProperties;
+import com.chuertag.practica1.client.RemoteFilesClient;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -31,6 +31,8 @@ public class ClientFilesPanel extends JPanel implements ActionListener {
     private int port;
 
     public ClientFilesPanel(String ipAddress, int port) {
+        UIManager.put("FileChooser.chooseButtonText", "Send file(s)");
+        UIManager.put("FileChooser.cancelButtonText", "Choose");
         serverIP = ipAddress;
         this.port = port;
         jfcroot = new File(RemoteFilesProperties.CURRENT_ABSOLUTE_PATH
@@ -46,8 +48,6 @@ public class ClientFilesPanel extends JPanel implements ActionListener {
         setLayout(new BorderLayout());
         add(navbar, BorderLayout.NORTH);
         add(jfc, BorderLayout.CENTER);
-        jtf.addActionListener(this);
-        jfc.addActionListener(this);
     }
 
     @Override
@@ -77,12 +77,12 @@ public class ClientFilesPanel extends JPanel implements ActionListener {
             }
         }
         if (ev.getActionCommand().equals("ApproveSelection")) {
-            jpb = RemoteFiles.setJProgressBar("Sending files");
+            jpb = RemoteFilesClient.setJProgressBar("Sending files");
             JOptionPane.showMessageDialog(null, jpb);
             try {
-                RemoteFiles.notifyServer(serverIP, port, true);
-                RemoteFiles.sendFiles(jfc.getSelectedFiles(), jpb, false, "",
-                        false, null, serverIP, port);
+                RemoteFilesClient.notifyServer(serverIP, port, true);
+                RemoteFilesClient.sendFiles(jfc.getSelectedFiles(), jpb, false,
+                        "", serverIP, port);
             } catch (IOException ex) {
                 JOptionPane.showMessageDialog(null,
                         "Oops! An error occured when sending file(s)");
@@ -92,10 +92,9 @@ public class ClientFilesPanel extends JPanel implements ActionListener {
 
     private void setFileChooser() {
         jfc = new JFileChooser(jfcroot);
-        UIManager.put("FileChooser.chooseButtonText", "Send file(s)");
-        UIManager.put("FileChooser.cancelButtonText", "Choose");
         jfc.setMultiSelectionEnabled(true);
         jfc.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
+        jfc.addActionListener(this);
     }
     
 }
